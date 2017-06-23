@@ -6,5 +6,4 @@ script:
   - env
   - echo $TRAVIS_COMMIT_RANGE
   - mkdir debs && chmod 777 debs
-  - git diff --name-only --diff-filter=AM $TRAVIS_COMMIT_RANGE | xargs cat
-  - ./scripts/run-docker.sh ./build-package.sh libandroid-support
+  - git diff --name-only --diff-filter=AM $TRAVIS_COMMIT_RANGE | awk -F/ '{print $2}' | xargs ./scripts/run-docker.sh ./build-package.sh

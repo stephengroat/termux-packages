@@ -4,5 +4,5 @@ services:
   - docker
 script:
   - mkdir debs && chmod 777 debs
-  - git diff --name-only HEAD...master
+  - git diff --name-only --diff-filter=AM $TRAVIS_COMMIT_RANGE
   - ./scripts/run-docker.sh ./build-package.sh libandroid-support

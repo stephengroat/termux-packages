@@ -19,7 +19,7 @@ docker start $CONTAINER_NAME > /dev/null 2> /dev/null || {
 if [ "$#" -eq  "0" ]; then
 	docker exec --interactive --tty --user builder $CONTAINER_NAME bash
 else
-	docker exec --interactive --tty --user $USER $CONTAINER_NAME $@
+	docker exec --interactive --tty --user builder $CONTAINER_NAME $@
 fi
 
 

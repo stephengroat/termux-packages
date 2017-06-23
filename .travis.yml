@@ -3,6 +3,7 @@ sudo: required
 services:
   - docker
 script:
+  - env
+  - echo $TRAVIS_COMMIT_RANGE
   - mkdir debs && chmod 777 debs
-  - git diff --name-only --diff-filter=AM $TRAVIS_COMMIT_RANGE
-  - ./scripts/run-docker.sh ./build-package.sh libandroid-support
+  - git diff --name-only --diff-filter=AM $TRAVIS_COMMIT_RANGE | awk -F/ '{print $2}' | xargs bash -c '</dev/tty ./scripts/run-docker.sh ./build-package.sh "$@"'

@@ -5,4 +5,4 @@ services:
 script:
   - mkdir debs
   - chmod 777 debs
-  - ./scripts/run-docker.sh ./build-package.sh libandroid-support
+  - ./scripts/run-docker.sh ./build-all.sh

@@ -16,6 +16,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-randomdev=/dev/random
 "
 
+
 termux_step_pre_configure () {
 	export BUILD_AR=ar
 	export BUILD_CC=gcc

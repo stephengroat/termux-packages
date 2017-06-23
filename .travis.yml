@@ -3,6 +3,6 @@ sudo: required
 services:
   - docker
 script:
-  - mkdir debs
-  - chmod 777 debs
-  - ./scripts/run-docker.sh ./build-all.sh
+  - mkdir debs && chmod 777 debs
+  - git diff --name-only HEAD...master
+  - ./scripts/run-docker.sh ./build-package.sh libandroid-support

@@ -2,4 +2,6 @@ language: generic
 sudo: required
 services:
   - docker
-script: ./scripts/run-docker.sh ./build-package.sh libandroid-support
+script:
+  - mkdir debs
+  - ./scripts/run-docker.sh ./build-package.sh libandroid-support

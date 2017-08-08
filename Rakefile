@@ -36,3 +36,13 @@ task :build do
     end
   end
 end
+
+task :maintainers_to_codeowners do
+  Dir['packages/*/build.sh'].each do |script|
+    File.open(script) do |file|
+      file.each_line do |line|
+        puts line
+      end
+    end
+  end
+end

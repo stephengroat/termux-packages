@@ -3,3 +3,7 @@ sudo: required
 cache: bundler
 services: docker
 before_script: mkdir debs && chmod 777 debs
+matrix:
+  include:
+    - script: bundle exec rake
+    - script: bundle exec rake build["-i"]

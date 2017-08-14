@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e -o pipefail -u
+set -e -o pipefail -u -x
 
 # Utility function to log an error message and exit with an error code.
 termux_error_exit() {
@@ -160,7 +160,7 @@ termux_setup_meson() {
 # Utility function for cmake-built packages to setup a current cmake.
 termux_setup_cmake() {
 	local TERMUX_CMAKE_MAJORVESION=3.9
-	local TERMUX_CMAKE_MINORVERSION=1
+	local TERMUX_CMAKE_MINORVERSION="0"
 	local TERMUX_CMAKE_VERSION=$TERMUX_CMAKE_MAJORVESION.$TERMUX_CMAKE_MINORVERSION
 	local TERMUX_CMAKE_TARNAME=cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64.tar.gz
 	local TERMUX_CMAKE_TARFILE=$TERMUX_PKG_TMPDIR/$TERMUX_CMAKE_TARNAME
@@ -168,7 +168,7 @@ termux_setup_cmake() {
 	if [ ! -d "$TERMUX_CMAKE_FOLDER" ]; then
 		termux_download https://cmake.org/files/v$TERMUX_CMAKE_MAJORVESION/$TERMUX_CMAKE_TARNAME \
 		                "$TERMUX_CMAKE_TARFILE" \
-		                ecbaf72981ccd09d9dade6d580cf1213eef15ef95a675dd9d4f0d693f134644f
+				e714ddd55ab9be7ec5e4d30ca1ceee5e23406d7d3bf14457a67180cf54d9834a
 		rm -Rf "$TERMUX_PKG_TMPDIR/cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64"
 		tar xf "$TERMUX_CMAKE_TARFILE" -C "$TERMUX_PKG_TMPDIR"
 		mv "$TERMUX_PKG_TMPDIR/cmake-${TERMUX_CMAKE_VERSION}-Linux-x86_64" \
@@ -191,16 +191,18 @@ termux_step_handle_arguments() {
 	    echo "  -d Build with debug symbols."
 	    echo "  -D Build a disabled package in disabled-packages/."
 	    echo "  -f Force build even if package has already been built."
+	    echo "  -i Install dependencies."
 	    echo "  -s Skip dependency check."
 	    exit 1
 	}
-	while getopts :a:hdDfs option; do
+	while getopts :a:hdDfis option; do
 		case "$option" in
 		a) TERMUX_ARCH="$OPTARG";;
 		h) _show_usage;;
 		d) TERMUX_DEBUG=true;;
 		D) local TERMUX_IS_DISABLED=true;;
 		f) TERMUX_FORCE_BUILD=true;;
+		i) export TERMUX_INSTALL_DEPS=true;;
 		s) export TERMUX_SKIP_DEPCHECK=true;;
 		?) termux_error_exit "./build-package.sh: illegal option -$OPTARG";;
 		esac
@@ -254,7 +256,7 @@ termux_step_setup_variables() {
 	: "${TERMUX_ANDROID_HOME:="/data/data/com.termux/files/home"}"
 	: "${TERMUX_DEBUG:=""}"
 	: "${TERMUX_PKG_API_LEVEL:="21"}"
-	: "${TERMUX_ANDROID_BUILD_TOOLS_VERSION:="26.0.1"}"
+	: "${TERMUX_ANDROID_BUILD_TOOLS_VERSION:="25.0.3"}"
 	: "${TERMUX_NDK_VERSION:="15.2"}"
 
 	if [ "x86_64" = "$TERMUX_ARCH" ] || [ "aarch64" = "$TERMUX_ARCH" ]; then
@@ -280,6 +282,8 @@ termux_step_setup_variables() {
 	# to avoid stuff like arm-linux-androideabi-ld there to conflict with ones from
 	# the standalone toolchain.
 	TERMUX_DX=$ANDROID_HOME/build-tools/$TERMUX_ANDROID_BUILD_TOOLS_VERSION/dx
+	TERMUX_JACK=$ANDROID_HOME/build-tools/$TERMUX_ANDROID_BUILD_TOOLS_VERSION/jack.jar
+	TERMUX_JILL=$ANDROID_HOME/build-tools/$TERMUX_ANDROID_BUILD_TOOLS_VERSION/jill.jar
 
 	TERMUX_COMMON_CACHEDIR="$TERMUX_TOPDIR/_cache"
 	TERMUX_DEBDIR="$TERMUX_SCRIPTDIR/debs"
@@ -372,13 +376,67 @@ termux_step_start_build() {
 		exit 0
 	fi
 
+	if [ ! -z ${TERMUX_INSTALL_DEPS+x} ]; then
+		# Ensure folders present (but not $TERMUX_PKG_SRCDIR, it will be created in build)
+		mkdir -p "$TERMUX_COMMON_CACHEDIR" \
+			"$TERMUX_DEBDIR" \
+			 "$TERMUX_PKG_BUILDDIR" \
+			 "$TERMUX_PKG_PACKAGEDIR" \
+			 "$TERMUX_PKG_TMPDIR" \
+			 "$TERMUX_PKG_CACHEDIR" \
+			 "$TERMUX_PKG_MASSAGEDIR" \
+			 $TERMUX_PREFIX/{bin,etc,lib,libexec,share,tmp,include}
+		# Setup bootstrap
+		termux_download https://termux.net/bootstrap/bootstrap-${TERMUX_ARCH}.zip \
+				${TERMUX_COMMON_CACHEDIR}/bootstrap-${TERMUX_ARCH}.zip
+		unzip ${TERMUX_COMMON_CACHEDIR}/bootstrap-${TERMUX_ARCH}.zip -d $TERMUX_PREFIX
+
+		# TODO move this install to Dockerfile
+		# Install add-apt-repository (software-properties-common)
+		sudo apt-get update && sudo apt-get -y dist-upgrade && sudo apt-get install -y software-properties-common libcap2-bin tree strace
+		# Add termux apt repository and key, update
+		sudo add-apt-repository "deb [arch=all,$TERMUX_ARCH] http://termux.net stable main"
+		curl https://raw.githubusercontent.com/termux/termux-packages/master/packages/apt/trusted.gpg | sudo apt-key add -
+		sudo apt-get update
+		# set capabilities on dpkg
+		# Some packages built by uid 1001 (builder is 1000)
+		# Need capabilities for dpkg to set non-builder uid
+		sudo /sbin/setcap cap_chown,cap_fowner,cap_dac_override+eip /usr/bin/dpkg
+		# TODO use apt to install packages to get dependencies
+		# install packages that include subpackages
+		while IFS=',' read -ra PKG; do
+			for p in "${PKG[@]}"; do
+				p="$(echo -e "${p}" | tr -d '[:space:]')"
+				(cd $TERMUX_DEBDIR; apt-get -t stable \
+							    -o Apt::Architecture=${TERMUX_ARCH} \
+							    download "^${p}(-dev)?$":any)
+				dpkg --force-not-root --force-architecture \
+				     --admindir ${TERMUX_PREFIX}/var/lib/dpkg \
+				     --unpack ${TERMUX_DEBDIR}/${p}*_*_*.deb
+			done
+		done <<< "$TERMUX_PKG_DEPENDS"
+	fi
+
 	if [ -z "${TERMUX_SKIP_DEPCHECK:=""}" ]; then
 		local p TERMUX_ALL_DEPS
 		TERMUX_ALL_DEPS=$(./scripts/buildorder.py "$TERMUX_PKG_NAME")
 		for p in $TERMUX_ALL_DEPS; do
 			if [ "$p" != "$TERMUX_PKG_NAME" ]; then
-				echo "Building dependency $p if necessary..."
-				./build-package.sh -a $TERMUX_ARCH -s "$p"
+				if [ ! -z ${TERMUX_INSTALL_DEPS+x} ]; then
+					echo "Installing dependency $p"
+					(cd $TERMUX_DEBDIR; apt-get -t stable \
+								    -o Apt::Architecture=${TERMUX_ARCH} \
+								    download "^${p}(-dev)?$":any)
+					dpkg --force-not-root --force-architecture \
+					     --admindir ${TERMUX_PREFIX}/var/lib/dpkg \
+					     --unpack ${TERMUX_DEBDIR}/${p}*_*_*.deb
+					# Some packages built by uid 1001 (builder is 1000)
+					# need to change
+					sudo chown -R builder:builder /data
+				else
+					echo "Building dependency $p if necessary..."
+					./build-package.sh -a $TERMUX_ARCH -s "$p"
+				fi
 			fi
 		done
 	fi

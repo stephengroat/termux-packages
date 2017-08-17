@@ -413,6 +413,17 @@ termux_step_start_build() {
 				     --unpack ${TERMUX_DEBDIR}/${p}*_*_*.deb
 			done
 		done <<< "$TERMUX_PKG_DEPENDS"
+		while IFS=',' read -ra PKG; do
+			for p in "${PKG[@]}"; do
+				p="$(echo -e "${p}" | tr -d '[:space:]')"
+				(cd $TERMUX_DEBDIR; apt-get -t stable \
+							    -o Apt::Architecture=${TERMUX_ARCH} \
+							    download "^${p}(-dev)?$":any)
+				dpkg --force-not-root --force-architecture \
+				     --admindir ${TERMUX_PREFIX}/var/lib/dpkg \
+				     --unpack ${TERMUX_DEBDIR}/${p}*_*_*.deb
+			done
+		done <<< "$TERMUX_PKG_BUILD_DEPENDS"
 	fi
 
 	if [ -z "${TERMUX_SKIP_DEPCHECK:=""}" ]; then

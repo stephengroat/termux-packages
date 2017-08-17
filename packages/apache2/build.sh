@@ -68,7 +68,6 @@ TERMUX_PKG_INCLUDE_IN_DEVPACKAGE="share/apache2/build"
 TERMUX_PKG_EXTRA_MAKE_ARGS="-s"
 
 termux_step_pre_configure () {
-	sed -i 's/\/home\/fornwall\/.termux-build\/apr\/tmp/\/usr\/bin/' $TERMUX_PREFIX/bin/apr-1-config
 	# remove old files
 	rm -rf "$TERMUX_PREFIX"/{libexec,share,etc}/apache2
 	rm -rf "$TERMUX_PREFIX"/lib/cgi-bin

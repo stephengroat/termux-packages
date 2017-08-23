@@ -406,6 +406,8 @@ termux_step_start_build() {
 		while IFS=',' read -ra PKG; do
 			for p in "${PKG[@]}"; do
 				p="$(echo -e "${p}" | tr -d '[:space:]')"
+				ls -lah /etc/apt
+				cat /etc/apt/apt.conf.d/*
 				DEBCONF_FRONTEND=noninteractive apt-get -y -t stable \
 					-o Apt::Architecture=${TERMUX_ARCH} \
 					-o PackageManager::Configure=no \

@@ -400,17 +400,26 @@ termux_step_start_build() {
 		# Some packages built by uid 1001 (builder is 1000)
 		# Need capabilities for dpkg to set non-builder uid
 		sudo /sbin/setcap cap_chown,cap_fowner,cap_dac_override+eip /usr/bin/dpkg
+		sudo /sbin/setcap cap_chown,cap_fowner,cap_dac_override+eip /usr/bin/apt
 		# TODO use apt to install packages to get dependencies
 		# install packages that include subpackages
 		while IFS=',' read -ra PKG; do
 			for p in "${PKG[@]}"; do
 				p="$(echo -e "${p}" | tr -d '[:space:]')"
-				(cd $TERMUX_DEBDIR; apt-get -t stable \
-							    -o Apt::Architecture=${TERMUX_ARCH} \
-							    download "^${p}(-dev)?$":any)
-				dpkg --force-not-root --force-architecture \
-				     --admindir ${TERMUX_PREFIX}/var/lib/dpkg \
-				     --unpack ${TERMUX_DEBDIR}/${p}*_*_*.deb
+				DEBCONF_FRONTEND='noninteractive' apt-get -y -t stable \
+					-o Apt::Architecture=${TERMUX_ARCH} \
+					-o PackageManager::Configure=no \
+					-o Dir::Etc::Main='' \
+					-o Dir::Etc::Parts='' \
+					-o Dir::Etc::Sourcelist='${TERMUX_PREFIX}/etc/apt/sources.list' \
+					-o Dir::State::Lists='${TERMUX_PREFIX}/var/lib/apt/lists' \
+					-o Dir::State::Status='${TERMUX_PREFIX}/var/lib/dpkg/status' \
+					-o Dir::Cache='${TERMUX_PREFIX}/var/cache/apt' \
+					-o Dpkg::NoTriggers='true' \
+					-o Dpkg::Options::='--force-not-root' \
+					-o Dpkg::Pre-Install-Pkgs='' \
+					-o Debug::RunScripts=true \
+					install "^${p}(-dev)?$":any
 			done
 		done <<< "$TERMUX_PKG_DEPENDS"
 		while IFS=',' read -ra PKG; do

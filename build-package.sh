@@ -419,6 +419,20 @@ termux_step_start_build() {
 					-o Dpkg::Options::='--force-not-root' \
 					-o Dpkg::Pre-Install-Pkgs='' \
 					-o Debug::RunScripts=true \
+					update
+				DEBCONF_FRONTEND=noninteractive apt-get -y -t stable \
+					-o Apt::Architecture=${TERMUX_ARCH} \
+					-o PackageManager::Configure=no \
+					-o Dir::Etc::Main='' \
+					-o Dir::Etc::Parts='' \
+					-o Dir::Etc::Sourcelist=${TERMUX_PREFIX}/etc/apt/sources.list \
+					-o Dir::State::Lists=${TERMUX_PREFIX}/var/lib/apt/lists \
+					-o Dir::State::Status=${TERMUX_PREFIX}/var/lib/dpkg/status \
+					-o Dir::Cache=${TERMUX_PREFIX}/var/cache/apt \
+					-o Dpkg::NoTriggers='true' \
+					-o Dpkg::Options::='--force-not-root' \
+					-o Dpkg::Pre-Install-Pkgs='' \
+					-o Debug::RunScripts=true \
 					install "^${p}(-dev)?$":any
 			done
 		done <<< "$TERMUX_PKG_DEPENDS"

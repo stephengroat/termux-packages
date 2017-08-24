@@ -403,48 +403,33 @@ termux_step_start_build() {
 		sudo /sbin/setcap cap_chown,cap_fowner,cap_dac_override+eip /usr/bin/apt
 		# TODO use apt to install packages to get dependencies
 		# install packages that include subpackages
+		sudo sed -i -e 's/DPkg::Pre-Install-Pkgs/\/\/ DPkg::Pre-Install-Pkgs/' /etc/apt/apt.conf.d/*
+		sudo sed -i -e 's/DPkg::Post-Invoke/\/\/ DPkg::Post-Invoke/' /etc/apt/apt.conf.d/*
+		sudo sed -i -e 's/APT::Update::Post-Invoke/\/\/ APT::Update::Post-Invoke/' /etc/apt/apt.conf.d/*
+		TERMUX_APT = DEBCONF_FRONTEND=noninteractive apt-get -y -t stable \
+			-o Apt::Architecture=${TERMUX_ARCH} \
+			-o PackageManager::Configure=no \
+			-o Dir::Etc::Main='' \
+			-o Dir::Etc::Parts='' \
+			-o Dir::Etc::Sourcelist=${TERMUX_PREFIX}/etc/apt/sources.list \
+			-o Dir::State=${TERMUX_PREFIX}/var/lib/apt \
+			-o Dir::State::Lists=${TERMUX_PREFIX}/var/lib/apt/lists \
+			-o Dir::State::status=${TERMUX_PREFIX}/var/lib/dpkg/status \
+			-o Dir::Cache=${TERMUX_PREFIX}/var/cache/apt \
+			-o Dir::Log=${TERMUX_PREFIX}/var/log/apt \
+			-o Dpkg::NoTriggers='true' \
+			-o Dpkg::Options::='--force-not-root' \
+			-o Dpkg::Pre-Install-Pkgs='' \
+			-o Debug::RunScripts=true \
+			-o Debug::pkgDPkgPM=true \
+			-o Debug::pkgDPkgProgressReporting=true
+		$TERMUX_APT update
+		$TERMUX_APT upgrade
 		while IFS=',' read -ra PKG; do
 			for p in "${PKG[@]}"; do
 				p="$(echo -e "${p}" | tr -d '[:space:]')"
-				cat /etc/apt/apt.conf.d/*
-				sudo sed -i -e 's/DPkg::Pre-Install-Pkgs/\/\/ DPkg::Pre-Install-Pkgs/' /etc/apt/apt.conf.d/*
-				sudo sed -i -e 's/DPkg::Post-Invoke/\/\/ DPkg::Post-Invoke/' /etc/apt/apt.conf.d/*
-				sudo sed -i -e 's/APT::Update::Post-Invoke/\/\/ APT::Update::Post-Invoke/' /etc/apt/apt.conf.d/*
-				cat /etc/apt/apt.conf.d/*
-				ls -lah ${TERMUX_PREFIX}/var/lib/dpkg
-				DEBCONF_FRONTEND=noninteractive apt-get -y -t stable \
-					-o Apt::Architecture=${TERMUX_ARCH} \
-					-o PackageManager::Configure=no \
-					-o Dir::Etc::Main='' \
-					-o Dir::Etc::Parts='' \
-					-o Dir::Etc::Sourcelist=${TERMUX_PREFIX}/etc/apt/sources.list \
-					-o Dir::State::Lists=${TERMUX_PREFIX}/var/lib/apt/lists \
-					-o Dir::State::status=${TERMUX_PREFIX}/var/lib/dpkg/status \
-					-o Dir::Cache=${TERMUX_PREFIX}/var/cache/apt \
-					-o Dir::Log=${TERMUX_PREFIX}/var/log/apt \
-					-o Dpkg::NoTriggers='true' \
-					-o Dpkg::Options::='--force-not-root' \
-					-o Dpkg::Pre-Install-Pkgs='' \
-					-o Debug::RunScripts=true \
-					update
-				DEBCONF_FRONTEND=noninteractive apt-get -y -t stable \
-					-o Apt::Architecture=${TERMUX_ARCH} \
-					-o PackageManager::Configure=no \
-					-o Dir::Etc::Main='' \
-					-o Dir::Etc::Parts='' \
-					-o Dir::Etc::Sourcelist=${TERMUX_PREFIX}/etc/apt/sources.list \
-					-o Dir::State=${TERMUX_PREFIX}/var/lib/apt \
-					-o Dir::State::Lists=${TERMUX_PREFIX}/var/lib/apt/lists \
-					-o Dir::State::status=${TERMUX_PREFIX}/var/lib/dpkg/status \
-					-o Dir::Cache=${TERMUX_PREFIX}/var/cache/apt \
-					-o Dir::Log=${TERMUX_PREFIX}/var/log/apt \
-					-o Dpkg::NoTriggers='true' \
-					-o Dpkg::Options::='--force-not-root' \
-					-o Dpkg::Pre-Install-Pkgs='' \
-					-o Debug::RunScripts=true \
-					-o Debug::pkgDPkgPM=true \
-					-o Debug::pkgDPkgProgressReporting=true \
-					install "^${p}(-dev)?$":any
+				$TERMUX_APT install "^${p}(-dev)?$":any
+				sudo chown -R builder:builder /data
 			done
 		done <<< "$TERMUX_PKG_DEPENDS"
 		while IFS=',' read -ra PKG; do
@@ -465,18 +450,7 @@ termux_step_start_build() {
 		TERMUX_ALL_DEPS=$(./scripts/buildorder.py "$TERMUX_PKG_NAME")
 		for p in $TERMUX_ALL_DEPS; do
 			if [ "$p" != "$TERMUX_PKG_NAME" ]; then
-				if [ ! -z ${TERMUX_INSTALL_DEPS+x} ]; then
-					echo "Installing dependency $p"
-					(cd $TERMUX_DEBDIR; apt-get -t stable \
-								    -o Apt::Architecture=${TERMUX_ARCH} \
-								    download "^${p}(-dev)?$":any)
-					dpkg --force-not-root --force-architecture \
-					     --admindir ${TERMUX_PREFIX}/var/lib/dpkg \
-					     --unpack ${TERMUX_DEBDIR}/${p}*_*_*.deb
-					# Some packages built by uid 1001 (builder is 1000)
-					# need to change
-					sudo chown -R builder:builder /data
-				else
+				if [ -z ${TERMUX_INSTALL_DEPS+x} ]; then
 					echo "Building dependency $p if necessary..."
 					./build-package.sh -a $TERMUX_ARCH -s "$p"
 				fi

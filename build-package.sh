@@ -407,7 +407,7 @@ termux_step_start_build() {
 			for p in "${PKG[@]}"; do
 				p="$(echo -e "${p}" | tr -d '[:space:]')"
 				cat /etc/apt/apt.conf.d/*
-				sudo sed -ie 's/DPkg::Pre-Install-Pkgs/\/\/ DPkg::Pre-Install-Pkgs/' /etc/apt/apt.conf.d/*
+				sudo sed -i -e 's/DPkg::Pre-Install-Pkgs/\/\/ DPkg::Pre-Install-Pkgs/' /etc/apt/apt.conf.d/*
 				cat /etc/apt/apt.conf.d/*
 				DEBCONF_FRONTEND=noninteractive apt-get -y -t stable \
 					-o Apt::Architecture=${TERMUX_ARCH} \

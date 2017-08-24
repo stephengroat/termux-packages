@@ -442,6 +442,8 @@ termux_step_start_build() {
 					-o Dpkg::Options::='--force-not-root' \
 					-o Dpkg::Pre-Install-Pkgs='' \
 					-o Debug::RunScripts=true \
+					-o Debug::pkgDPkgPM=true \
+					-o Debug::pkgDPkgProgressReporting=true \
 					install "^${p}(-dev)?$":any
 			done
 		done <<< "$TERMUX_PKG_DEPENDS"

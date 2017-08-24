@@ -406,7 +406,7 @@ termux_step_start_build() {
 		sudo sed -i -e 's/DPkg::Pre-Install-Pkgs/\/\/ DPkg::Pre-Install-Pkgs/' /etc/apt/apt.conf.d/*
 		sudo sed -i -e 's/DPkg::Post-Invoke/\/\/ DPkg::Post-Invoke/' /etc/apt/apt.conf.d/*
 		sudo sed -i -e 's/APT::Update::Post-Invoke/\/\/ APT::Update::Post-Invoke/' /etc/apt/apt.conf.d/*
-		TERMUX_APT = DEBCONF_FRONTEND=noninteractive apt-get -y -t stable \
+		TERMUX_APT = -y -t stable \
 			-o Apt::Architecture=${TERMUX_ARCH} \
 			-o PackageManager::Configure=no \
 			-o Dir::Etc::Main='' \
@@ -423,24 +423,21 @@ termux_step_start_build() {
 			-o Debug::RunScripts=true \
 			-o Debug::pkgDPkgPM=true \
 			-o Debug::pkgDPkgProgressReporting=true
-		$TERMUX_APT update
-		$TERMUX_APT upgrade
+		DEBCONF_FRONTEND=noninteractive apt-get $TERMUX_APT update
+		DEBCONF_FRONTEND=noninteractive apt-get $TERMUX_APT upgrade
+		sudo chown -R builder:builder /data
 		while IFS=',' read -ra PKG; do
 			for p in "${PKG[@]}"; do
 				p="$(echo -e "${p}" | tr -d '[:space:]')"
-				$TERMUX_APT install "^${p}(-dev)?$":any
+				DEBCONF_FRONTEND=noninteractive apt-get $TERMUX_APT install "^${p}(-dev)?$":any
 				sudo chown -R builder:builder /data
 			done
 		done <<< "$TERMUX_PKG_DEPENDS"
 		while IFS=',' read -ra PKG; do
 			for p in "${PKG[@]}"; do
 				p="$(echo -e "${p}" | tr -d '[:space:]')"
-				(cd $TERMUX_DEBDIR; apt-get -t stable \
-							    -o Apt::Architecture=${TERMUX_ARCH} \
-							    download "^${p}(-dev)?$":any)
-				dpkg --force-not-root --force-architecture \
-				     --admindir ${TERMUX_PREFIX}/var/lib/dpkg \
-				     --unpack ${TERMUX_DEBDIR}/${p}*_*_*.deb
+				DEBCONF_FRONTEND=noninteractive apt-get $TERMUX_APT install "^${p}(-dev)?$":any
+				sudo chown -R builder:builder /data
 			done
 		done <<< "$TERMUX_PKG_BUILD_DEPENDS"
 	fi

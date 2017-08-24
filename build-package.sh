@@ -408,6 +408,8 @@ termux_step_start_build() {
 				p="$(echo -e "${p}" | tr -d '[:space:]')"
 				cat /etc/apt/apt.conf.d/*
 				sudo sed -i -e 's/DPkg::Pre-Install-Pkgs/\/\/ DPkg::Pre-Install-Pkgs/' /etc/apt/apt.conf.d/*
+				sudo sed -i -e 's/DPkg::Post-Invoke/\/\/ DPkg::Post-Invoke/' /etc/apt/apt.conf.d/*
+				sudo sed -i -e 's/APT::Update::Post-Invoke/\/\/ APT::Update::Post-Invoke/' /etc/apt/apt.conf.d/*
 				cat /etc/apt/apt.conf.d/*
 				DEBCONF_FRONTEND=noninteractive apt-get -y -t stable \
 					-o Apt::Architecture=${TERMUX_ARCH} \
@@ -430,6 +432,7 @@ termux_step_start_build() {
 					-o Dir::Etc::Main='' \
 					-o Dir::Etc::Parts='' \
 					-o Dir::Etc::Sourcelist=${TERMUX_PREFIX}/etc/apt/sources.list \
+					-o Dir::State::Lists=${TERMUX_PREFIX}/var/lib/apt \
 					-o Dir::State::Lists=${TERMUX_PREFIX}/var/lib/apt/lists \
 					-o Dir::State::Status=${TERMUX_PREFIX}/var/lib/dpkg/status \
 					-o Dir::Cache=${TERMUX_PREFIX}/var/cache/apt \

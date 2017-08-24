@@ -411,6 +411,7 @@ termux_step_start_build() {
 				sudo sed -i -e 's/DPkg::Post-Invoke/\/\/ DPkg::Post-Invoke/' /etc/apt/apt.conf.d/*
 				sudo sed -i -e 's/APT::Update::Post-Invoke/\/\/ APT::Update::Post-Invoke/' /etc/apt/apt.conf.d/*
 				cat /etc/apt/apt.conf.d/*
+				ls -lah ${TERMUX_PREFIX}/var/lib/dpkg
 				DEBCONF_FRONTEND=noninteractive apt-get -y -t stable \
 					-o Apt::Architecture=${TERMUX_ARCH} \
 					-o PackageManager::Configure=no \

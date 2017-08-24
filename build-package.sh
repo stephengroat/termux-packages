@@ -432,7 +432,7 @@ termux_step_start_build() {
 					-o Dir::Etc::Main='' \
 					-o Dir::Etc::Parts='' \
 					-o Dir::Etc::Sourcelist=${TERMUX_PREFIX}/etc/apt/sources.list \
-					-o Dir::State::Lists=${TERMUX_PREFIX}/var/lib/apt \
+					-o Dir::State=${TERMUX_PREFIX}/var/lib/apt \
 					-o Dir::State::Lists=${TERMUX_PREFIX}/var/lib/apt/lists \
 					-o Dir::State::Status=${TERMUX_PREFIX}/var/lib/dpkg/status \
 					-o Dir::Cache=${TERMUX_PREFIX}/var/cache/apt \

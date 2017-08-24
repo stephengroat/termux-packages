@@ -406,7 +406,7 @@ termux_step_start_build() {
 		sudo sed -i -e 's/DPkg::Pre-Install-Pkgs/\/\/ DPkg::Pre-Install-Pkgs/' /etc/apt/apt.conf.d/*
 		sudo sed -i -e 's/DPkg::Post-Invoke/\/\/ DPkg::Post-Invoke/' /etc/apt/apt.conf.d/*
 		sudo sed -i -e 's/APT::Update::Post-Invoke/\/\/ APT::Update::Post-Invoke/' /etc/apt/apt.conf.d/*
-		TERMUX_APT=-y -t stable \
+		TERMUX_APT="-y -t stable \
 			-o Apt::Architecture=${TERMUX_ARCH} \
 			-o PackageManager::Configure=no \
 			-o Dir::Etc::Main='' \
@@ -422,7 +422,7 @@ termux_step_start_build() {
 			-o Dpkg::Pre-Install-Pkgs='' \
 			-o Debug::RunScripts=true \
 			-o Debug::pkgDPkgPM=true \
-			-o Debug::pkgDPkgProgressReporting=true
+			-o Debug::pkgDPkgProgressReporting=true"
 		DEBCONF_FRONTEND=noninteractive apt-get $TERMUX_APT update
 		DEBCONF_FRONTEND=noninteractive apt-get $TERMUX_APT upgrade
 		sudo chown -R builder:builder /data

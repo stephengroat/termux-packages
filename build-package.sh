@@ -441,6 +441,7 @@ termux_step_start_build() {
 				sudo chown -R builder:builder /data
 			done
 		done <<< "$TERMUX_PKG_BUILD_DEPENDS"
+		tree /data/data/com.termux/files/usr
 	fi
 
 	if [ -z "${TERMUX_SKIP_DEPCHECK:=""}" ]; then

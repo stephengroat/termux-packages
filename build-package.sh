@@ -422,6 +422,7 @@ termux_step_start_build() {
 			-o Dpkg::NoTriggers='true' \
 			-o Dpkg::Options::='--force-not-root' \
 			-o Dpkg::Pre-Install-Pkgs='' \
+			-o Dpkg::ConfigurePending=false \
 			-o Debug::RunScripts=true \
 			-o Debug::pkgDPkgPM=true \
 			-o Debug::pkgDPkgProgressReporting=true"

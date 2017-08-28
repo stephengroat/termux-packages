@@ -421,6 +421,7 @@ termux_step_start_build() {
 			-o Dpkg::Options::='--force-not-root' \
 			-o Dpkg::Options::='--debug=3773' \
 			-o Dpkg::Options::=--admindir=${TERMUX_PREFIX}/var/lib/dpkg \
+			-o Dpkg::Options::=--force-architecture \
 			-o Debug::RunScripts=true \
 			-o Debug::pkgDPkgPM=true \
 			-o Debug::pkgDPkgProgressReporting=true"

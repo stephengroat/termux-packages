@@ -410,9 +410,10 @@ termux_step_start_build() {
 		cat /etc/apt/apt.conf.d/*
 		TERMUX_APT=" \
 			-o Apt::Architecture=${TERMUX_ARCH} \
-			-o PackageManager::Configure=no \
-			-o Dir::Etc::Main='' \
-			-o Dir::Etc::Parts='' \
+			-o PackageManager::Configure=false \
+			-o Dir::Etc=${TERMUX_PREFIX}/etc/apt/ \
+			-o Dir::Etc::Main= \
+			-o Dir::Etc::Parts= \
 			-o Dir::Etc::Sourcelist=${TERMUX_PREFIX}/etc/apt/sources.list \
 			-o Dir::State=${TERMUX_PREFIX}/var/lib/apt \
 			-o Dir::State::Lists=${TERMUX_PREFIX}/var/lib/apt/lists \

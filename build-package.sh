@@ -419,12 +419,13 @@ termux_step_start_build() {
 			-o Dir::Cache=${TERMUX_PREFIX}/var/cache/apt \
 			-o Dir::Cache=${TERMUX_PREFIX}/var/cache/apt \
 			-o Dir::Log=${TERMUX_PREFIX}/var/log/apt \
+			-o Dpkg::ConfigurePending=false \
 			-o Dpkg::Options::=--force-not-root \
-			-o Dpkg::Options::=--debug=73773 \
+			-o Dpkg::Options::=--force-architecture \
+			-o Dpkg::Options::=--admindir=${TERMUX_PREFIX}/var/lib/dpkg \
 			-o Debug::RunScripts=true \
 			-o Debug::pkgDPkgPM=true \
-			-o Debug::pkgPackageManager=true \
-			-o Debug::pkgDPkgProgressReporting=true"
+			-o Debug::pkgPackageManager=true"
 		DEBCONF_FRONTEND=noninteractive apt-config $TERMUX_APT dump
 		DEBCONF_FRONTEND=noninteractive apt-get -y -t stable $TERMUX_APT update
 		DEBCONF_FRONTEND=noninteractive apt-get -y -t stable $TERMUX_APT upgrade

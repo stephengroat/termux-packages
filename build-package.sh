@@ -423,6 +423,7 @@ termux_step_start_build() {
 			-o Dpkg::Options::=--debug=73773 \
 			-o Debug::RunScripts=true \
 			-o Debug::pkgDPkgPM=true \
+			-o Debug::pkgPackageManager=true \
 			-o Debug::pkgDPkgProgressReporting=true"
 		DEBCONF_FRONTEND=noninteractive apt-config $TERMUX_APT dump
 		DEBCONF_FRONTEND=noninteractive apt-get -y -t stable $TERMUX_APT update

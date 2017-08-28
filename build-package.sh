@@ -408,7 +408,7 @@ termux_step_start_build() {
 		sudo sed -i -e 's/APT::Update::Post-Invoke/\/\/ APT::Update::Post-Invoke/' /etc/apt/apt.conf.d/*
 		cat /data/data/com.termux/files/usr/SYMLINKS.txt
 		cat /etc/apt/apt.conf.d/*
-		TERMUX_APT="-y -t stable \
+		TERMUX_APT=" \
 			-o Apt::Architecture=${TERMUX_ARCH} \
 			-o PackageManager::Configure=no \
 			-o Dir::Etc::Main='' \
@@ -427,20 +427,23 @@ termux_step_start_build() {
 			-o Debug::RunScripts=true \
 			-o Debug::pkgDPkgPM=true \
 			-o Debug::pkgDPkgProgressReporting=true"
-		DEBCONF_FRONTEND=noninteractive apt-get $TERMUX_APT update
-		DEBCONF_FRONTEND=noninteractive apt-get $TERMUX_APT upgrade
+		DEBCONF_FRONTEND=noninteractive apt-config $TERMUX_APT dump
+		DEBCONF_FRONTEND=noninteractive apt-get -y -t stable $TERMUX_APT update
+		DEBCONF_FRONTEND=noninteractive apt-get -y -t stable $TERMUX_APT upgrade
 		sudo chown -R builder:builder /data
 		while IFS=',' read -ra PKG; do
 			for p in "${PKG[@]}"; do
 				p="$(echo -e "${p}" | tr -d '[:space:]')"
-				DEBCONF_FRONTEND=noninteractive apt-get --reinstall $TERMUX_APT install "^${p}(-dev)?$":any
+				DEBCONF_FRONTEND=noninteractive apt-get --reinstall -y -t stable \
+					$TERMUX_APT install "^${p}(-dev)?$":any
 				sudo chown -R builder:builder /data
 			done
 		done <<< "$TERMUX_PKG_DEPENDS"
 		while IFS=',' read -ra PKG; do
 			for p in "${PKG[@]}"; do
 				p="$(echo -e "${p}" | tr -d '[:space:]')"
-				DEBCONF_FRONTEND=noninteractive apt-get --reinstall $TERMUX_APT install "^${p}(-dev)?$":any
+				DEBCONF_FRONTEND=noninteractive apt-get --reinstall -y -t stable \
+					$TERMUX_APT install "^${p}(-dev)?$":any
 				sudo chown -R builder:builder /data
 			done
 		done <<< "$TERMUX_PKG_BUILD_DEPENDS"

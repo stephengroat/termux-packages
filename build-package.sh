@@ -427,8 +427,6 @@ termux_step_start_build() {
 		DEBCONF_FRONTEND=noninteractive apt-config $TERMUX_APT dump
 		DEBCONF_FRONTEND=noninteractive apt-get -y -t stable $TERMUX_APT update
 		DEBCONF_FRONTEND=noninteractive apt-get -y -t stable $TERMUX_APT upgrade
-		cat ${TERMUX_PREFIX}/var/log/apt/*
-		cat ${TERMUX_PREFIX}/var/log/*
 		sudo chown -R builder:builder /data
 		while IFS=',' read -ra PKG; do
 			for p in "${PKG[@]}"; do

@@ -420,7 +420,7 @@ termux_step_start_build() {
 			-o Dir::Cache=${TERMUX_PREFIX}/var/cache/apt \
 			-o Dir::Log=${TERMUX_PREFIX}/var/log/apt \
 			-o Dpkg::Options::=--force-not-root \
-			-o Dpkg::Options::=--admindir=${TERMUX_PREFIX}/var/lib/dpkg \
+			-o Dpkg::Options::=--debug=73773 \
 			-o Debug::RunScripts=true \
 			-o Debug::pkgDPkgPM=true \
 			-o Debug::pkgDPkgProgressReporting=true"

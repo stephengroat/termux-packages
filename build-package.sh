@@ -424,11 +424,16 @@ termux_step_start_build() {
 			-o Debug::RunScripts=true \
 			-o Debug::pkgDPkgPM=true \
 			-o Debug::pkgPackageManager=true"
-		DEBCONF_FRONTEND=noninteractive apt-config $TERMUX_APT dump
-		DEBCONF_FRONTEND=noninteractive apt-get $TERMUX_APT update
-		DEBCONF_FRONTEND=noninteractive apt-get $TERMUX_APT upgrade
+		DEBCONF_FRONTEND=noninteractive \
+			APT_CONFIG="Dir::Etc::Parts ${TERMUX_PREFIX}/etc/apt/apt.conf.d/; Dir::Etc::main ${TERMUX_PREFIX}/etc/apt/apt.conf;" \
+			apt-config $TERMUX_APT dump
+		DEBCONF_FRONTEND=noninteractive \
+			APT_CONFIG="Dir::Etc::Parts ${TERMUX_PREFIX}/etc/apt/apt.conf.d/; Dir::Etc::main ${TERMUX_PREFIX}/etc/apt/apt.conf;" \
+			apt-get $TERMUX_APT update
+		DEBCONF_FRONTEND=noninteractive \
+			APT_CONFIG="Dir::Etc::Parts ${TERMUX_PREFIX}/etc/apt/apt.conf.d/; Dir::Etc::main ${TERMUX_PREFIX}/etc/apt/apt.conf;" \
+			strace apt-get $TERMUX_APT upgrade
 		cat /var/log/dpkg.log
-		cat ${TERMUX_PREFIX}/var/log/dpkg.log
 		sudo chown -R builder:builder /data
 		while IFS=',' read -ra PKG; do
 			for p in "${PKG[@]}"; do

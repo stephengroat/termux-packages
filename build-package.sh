@@ -405,7 +405,7 @@ termux_step_start_build() {
 		cat /data/data/com.termux/files/usr/SYMLINKS.txt
 		cat /etc/apt/apt.conf.d/*
 		TERMUX_APT=" \
-			-o APT::Default-Release=stable
+			-o APT::Default-Release=stable \
 			-o APT::Get::Assume-Yes=true \
 			-o Apt::Architecture=${TERMUX_ARCH} \
 			-o PackageManager::Configure=false \
@@ -423,13 +423,12 @@ termux_step_start_build() {
 			-o Dpkg::Options::=--admindir=${TERMUX_PREFIX}/var/lib/dpkg \
 			-o Debug::RunScripts=true \
 			-o Debug::pkgDPkgPM=true \
-			-o Debug::Debug::pkgDPkgProgressReporting=true \
 			-o Debug::pkgPackageManager=true"
 		DEBCONF_FRONTEND=noninteractive apt-config $TERMUX_APT dump
 		DEBCONF_FRONTEND=noninteractive apt-get $TERMUX_APT update
-		strace apt-get -y -t stable $TERMUX_APT update
 		DEBCONF_FRONTEND=noninteractive apt-get $TERMUX_APT upgrade
-		strace apt-get -y -t stable $TERMUX_APT upgrade
+		cat /var/log/dpkg.log
+		cat ${TERMUX_PREFIX}/var/log/dpkg.log
 		sudo chown -R builder:builder /data
 		while IFS=',' read -ra PKG; do
 			for p in "${PKG[@]}"; do

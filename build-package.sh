@@ -422,6 +422,7 @@ termux_step_start_build() {
 			-o Dpkg::Options::=--force-architecture \
 			-o Dpkg::Options::=--admindir=${TERMUX_PREFIX}/var/lib/dpkg \
 			-o Debug::RunScripts=true \
+			-o Debug::pkgInitialize=true \
 			-o Debug::pkgDPkgPM=true \
 			-o Debug::pkgPackageManager=true"
 		DEBCONF_FRONTEND=noninteractive \
@@ -432,13 +433,13 @@ termux_step_start_build() {
 			apt-get $TERMUX_APT update
 		DEBCONF_FRONTEND=noninteractive \
 			APT_CONFIG="Dir::Etc::Parts ${TERMUX_PREFIX}/etc/apt/apt.conf.d/; Dir::Etc::main ${TERMUX_PREFIX}/etc/apt/apt.conf;" \
-			strace apt-get $TERMUX_APT upgrade
+			apt-get $TERMUX_APT upgrade
 		cat /var/log/dpkg.log
 		sudo chown -R builder:builder /data
 		while IFS=',' read -ra PKG; do
 			for p in "${PKG[@]}"; do
 				p="$(echo -e "${p}" | tr -d '[:space:]')"
-				DEBCONF_FRONTEND=noninteractive apt-get --reinstall \
+				DEBCONF_FRONTEND=noninteractive apt-get \
 					$TERMUX_APT install "^${p}(-dev)?$":any
 				sudo chown -R builder:builder /data
 			done
@@ -446,7 +447,7 @@ termux_step_start_build() {
 		while IFS=',' read -ra PKG; do
 			for p in "${PKG[@]}"; do
 				p="$(echo -e "${p}" | tr -d '[:space:]')"
-				DEBCONF_FRONTEND=noninteractive apt-get --reinstall \
+				DEBCONF_FRONTEND=noninteractive apt-get \
 					$TERMUX_APT install "^${p}(-dev)?$":any
 				sudo chown -R builder:builder /data
 			done

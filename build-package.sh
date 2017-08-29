@@ -392,10 +392,6 @@ termux_step_start_build() {
 		# TODO move this install to Dockerfile
 		# Install add-apt-repository (software-properties-common)
 		sudo apt-get update && sudo apt-get -y dist-upgrade && sudo apt-get install -y software-properties-common libcap2-bin tree strace
-		# Add termux apt repository and key, update
-		sudo add-apt-repository "deb [arch=all,$TERMUX_ARCH] http://termux.net stable main"
-		curl https://raw.githubusercontent.com/termux/termux-packages/master/packages/apt/trusted.gpg | sudo apt-key add -
-		sudo apt-get update
 		# set capabilities on dpkg
 		# Some packages built by uid 1001 (builder is 1000)
 		# Need capabilities for dpkg to set non-builder uid
@@ -428,7 +424,9 @@ termux_step_start_build() {
 			-o Debug::pkgPackageManager=true"
 		DEBCONF_FRONTEND=noninteractive apt-config $TERMUX_APT dump
 		DEBCONF_FRONTEND=noninteractive apt-get -y -t stable $TERMUX_APT update
+		strace apt-get -y -t stable $TERMUX_APT update
 		DEBCONF_FRONTEND=noninteractive apt-get -y -t stable $TERMUX_APT upgrade
+		strace apt-get -y -t stable $TERMUX_APT upgrade
 		sudo chown -R builder:builder /data
 		while IFS=',' read -ra PKG; do
 			for p in "${PKG[@]}"; do

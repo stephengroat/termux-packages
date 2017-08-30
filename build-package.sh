@@ -420,8 +420,7 @@ termux_step_start_build() {
 			-o Dir::Log=${TERMUX_PREFIX}/var/log/apt \
 			-o Dpkg::ConfigurePending=false \
 			-o Dpkg::Options::=--force-not-root \
-			-o Dpkg::Options::=--force-architecture \
-			-o Dpkg::Options::=--admindir=${TERMUX_PREFIX}/var/lib/dpkg"
+			-o Dpkg::Options::=--force-architecture"
 		DEBCONF_FRONTEND=noninteractive \
 			apt-config $TERMUX_APT dump
 		DEBCONF_FRONTEND=noninteractive \

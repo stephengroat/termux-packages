@@ -419,7 +419,7 @@ termux_step_start_build() {
 			-o Dir::State::Lists=${TERMUX_PREFIX}/var/lib/apt/lists \
 			-o Dir::State::status=${TERMUX_PREFIX}/var/lib/dpkg/status \
 			-o Dir::Cache=${TERMUX_PREFIX}/var/cache/apt \
-			-o Dir::Cache=${TERMUX_PREFIX}/var/cache/apt \
+			-o Dir::Cache::Archives=${TERMUX_PREFIX}/var/cache/apt/archives \
 			-o Dir::Log=${TERMUX_PREFIX}/var/log/apt \
 			-o Dpkg::ConfigurePending=false \
 			-o Dpkg::Options::=--force-not-root \

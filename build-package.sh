@@ -405,6 +405,7 @@ termux_step_start_build() {
 		cat /data/data/com.termux/files/usr/SYMLINKS.txt
 		cat /etc/apt/apt.conf.d/*
 		TERMUX_APT=" \
+			--reinstall \
 			-o APT::Default-Release=stable \
 			-o APT::Clean-Installed=false \
 			-o APT::Immediate-Configure=false \

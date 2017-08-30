@@ -424,20 +424,20 @@ termux_step_start_build() {
 			-o Dpkg::Options::=--force-not-root \
 			-o Dpkg::Options::=--force-architecture \
 			-o Dpkg::Options::=--admindir=${TERMUX_PREFIX}/var/lib/dpkg"
-		DEBCONF_FRONTEND=noninteractive apt-get $TERMUX_APT update
-		DEBCONF_FRONTEND=noninteractive apt-get $TERMUX_APT upgrade
+		export DEBCONF_FRONTEND=noninteractive
+		apt-get $TERMUX_APT update && apt-get $TERMUX_APT upgrade
 		sudo chown -R builder:builder /data
 		while IFS=',' read -ra PKG; do
 			for p in "${PKG[@]}"; do
 				p="$(echo -e "${p}" | tr -d '[:space:]')"
-				DEBCONF_FRONTEND=noninteractive apt-get $TERMUX_APT install "^${p}(-dev)?$":any
+				apt-get $TERMUX_APT install "^${p}(-dev)?$":any
 				sudo chown -R builder:builder /data
 			done
 		done <<< "$TERMUX_PKG_DEPENDS"
 		while IFS=',' read -ra PKG; do
 			for p in "${PKG[@]}"; do
 				p="$(echo -e "${p}" | tr -d '[:space:]')"
-				DEBCONF_FRONTEND=noninteractive apt-get $TERMUX_APT install "^${p}(-dev)?$":any
+				apt-get $TERMUX_APT install "^${p}(-dev)?$":any
 				sudo chown -R builder:builder /data
 			done
 		done <<< "$TERMUX_PKG_BUILD_DEPENDS"

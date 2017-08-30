@@ -421,18 +421,12 @@ termux_step_start_build() {
 			-o Dpkg::ConfigurePending=false \
 			-o Dpkg::Options::=--force-not-root \
 			-o Dpkg::Options::=--force-architecture \
-			-o Dpkg::Options::=--admindir=${TERMUX_PREFIX}/var/lib/dpkg \
-			-o Debug::RunScripts=true \
-			-o Debug::pkgInitialize=true \
-			-o Debug::pkgPackageManager=true"
+			-o Dpkg::Options::=--admindir=${TERMUX_PREFIX}/var/lib/dpkg"
 		DEBCONF_FRONTEND=noninteractive \
-			APT_CONFIG="Dir::Etc::Parts ${TERMUX_PREFIX}/etc/apt/apt.conf.d/; Dir::Etc::main ${TERMUX_PREFIX}/etc/apt/apt.conf;" \
 			apt-config $TERMUX_APT dump
 		DEBCONF_FRONTEND=noninteractive \
-			APT_CONFIG="Dir::Etc::Parts ${TERMUX_PREFIX}/etc/apt/apt.conf.d/; Dir::Etc::main ${TERMUX_PREFIX}/etc/apt/apt.conf;" \
 			apt-get $TERMUX_APT update
 		DEBCONF_FRONTEND=noninteractive \
-			APT_CONFIG="Dir::Etc::Parts ${TERMUX_PREFIX}/etc/apt/apt.conf.d/; Dir::Etc::main ${TERMUX_PREFIX}/etc/apt/apt.conf;" \
 			apt-get $TERMUX_APT upgrade
 		sudo chown -R builder:builder /data
 		while IFS=',' read -ra PKG; do

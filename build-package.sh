@@ -452,6 +452,7 @@ termux_step_start_build() {
 			done
 		done <<< "$TERMUX_PKG_BUILD_DEPENDS"
 		/usr/bin/dpkg --force-not-root --force-architecture --admindir=/data/data/com.termux/files/usr/var/lib/dpkg --no-triggers --unpack --auto-deconfigure /data/data/com.termux/files/usr/var/cache/apt/archives/*.deb 
+		sudo chown -R builder:builder /data
 		tree /data/data/com.termux/files/usr
 	fi
 

@@ -424,7 +424,6 @@ termux_step_start_build() {
 			-o Dpkg::Options::=--admindir=${TERMUX_PREFIX}/var/lib/dpkg \
 			-o Debug::RunScripts=true \
 			-o Debug::pkgInitialize=true \
-			-o Debug::pkgDPkgPM=true \
 			-o Debug::pkgPackageManager=true"
 		DEBCONF_FRONTEND=noninteractive \
 			APT_CONFIG="Dir::Etc::Parts ${TERMUX_PREFIX}/etc/apt/apt.conf.d/; Dir::Etc::main ${TERMUX_PREFIX}/etc/apt/apt.conf;" \
@@ -435,7 +434,7 @@ termux_step_start_build() {
 		DEBCONF_FRONTEND=noninteractive \
 			APT_CONFIG="Dir::Etc::Parts ${TERMUX_PREFIX}/etc/apt/apt.conf.d/; Dir::Etc::main ${TERMUX_PREFIX}/etc/apt/apt.conf;" \
 			apt-get $TERMUX_APT upgrade
-		/usr/bin/dpkg --force-not-root --force-architecture --admindir=/data/data/com.termux/files/usr/var/lib/dpkg --status-fd 13 --no-triggers --unpack --auto-deconfigure /data/data/com.termux/files/usr/var/cache/apt/archives/busybox_1.27.1-2_aarch64.deb /data/data/com.termux/files/usr/var/cache/apt/archives/libandroid-support_22_aarch64.deb /data/data/com.termux/files/usr/var/cache/apt/archives/command-not-found_1.25_aarch64.deb /data/data/com.termux/files/usr/var/cache/apt/archives/ncurses_6.0.20170827_aarch64.deb 
+		/usr/bin/dpkg --force-not-root --force-architecture --admindir=/data/data/com.termux/files/usr/var/lib/dpkg --no-triggers --unpack --auto-deconfigure /data/data/com.termux/files/usr/var/cache/apt/archives/busybox_1.27.1-2_aarch64.deb /data/data/com.termux/files/usr/var/cache/apt/archives/libandroid-support_22_aarch64.deb /data/data/com.termux/files/usr/var/cache/apt/archives/command-not-found_1.25_aarch64.deb /data/data/com.termux/files/usr/var/cache/apt/archives/ncurses_6.0.20170827_aarch64.deb 
 		sudo chown -R builder:builder /data
 		while IFS=',' read -ra PKG; do
 			for p in "${PKG[@]}"; do

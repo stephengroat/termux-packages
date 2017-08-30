@@ -396,7 +396,7 @@ termux_step_start_build() {
 		# Some packages built by uid 1001 (builder is 1000)
 		# Need capabilities for dpkg to set non-builder uid
 		sudo /sbin/setcap cap_chown,cap_fowner,cap_dac_override+eip /usr/bin/dpkg
-		sudo /sbin/setcap cap_chown,cap_fowner,cap_dac_override+eip /usr/bin/apt
+		sudo /sbin/setcap cap_chown,cap_fowner,cap_dac_override+eip /usr/bin/apt-get
 		# TODO use apt to install packages to get dependencies
 		# install packages that include subpackages
 		sudo sed -i -e 's/DPkg::Pre-Install-Pkgs/\/\/ DPkg::Pre-Install-Pkgs/' /etc/apt/apt.conf.d/*

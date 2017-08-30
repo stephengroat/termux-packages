@@ -406,6 +406,7 @@ termux_step_start_build() {
 		cat /etc/apt/apt.conf.d/*
 		TERMUX_APT=" \
 			-o APT::Default-Release=stable \
+			-o APT::Immediate-Configure=false \
 			-o APT::Get::Assume-Yes=true \
 			-o Apt::Architecture=${TERMUX_ARCH} \
 			-o PackageManager::Configure=false \

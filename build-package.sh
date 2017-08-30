@@ -408,7 +408,8 @@ termux_step_start_build() {
 			-o APT::Default-Release=stable \
 			-o APT::Immediate-Configure=false \
 			-o APT::Get::Assume-Yes=true \
-			-o Apt::Architecture=${TERMUX_ARCH} \
+			-o APT::Get::ReInstall=true \
+			-o APT::Architecture=${TERMUX_ARCH} \
 			-o PackageManager::Configure=false \
 			-o Dir::Etc=${TERMUX_PREFIX}/etc/apt/ \
 			-o Dir::Etc::Sourcelist=${TERMUX_PREFIX}/etc/apt/sources.list \

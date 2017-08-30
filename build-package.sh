@@ -411,6 +411,7 @@ termux_step_start_build() {
 			-o APT::Get::Assume-Yes=true \
 			-o APT::Get::Fix-Missing=true \
 			-o APT::Get::ReInstall=true \
+			-o APT::Get::Download=true \
 			-o APT::Cache::Installed=true \
 			-o APT::Architecture=${TERMUX_ARCH} \
 			-o Dir::Etc=${TERMUX_PREFIX}/etc/apt/ \
@@ -418,8 +419,8 @@ termux_step_start_build() {
 			-o Dir::State=${TERMUX_PREFIX}/var/lib/apt \
 			-o Dir::State::Lists=${TERMUX_PREFIX}/var/lib/apt/lists \
 			-o Dir::State::status=${TERMUX_PREFIX}/var/lib/dpkg/status \
-			-o Dir::Cache= \
-			-o Dir::Cache::Archives= \
+			-o Dir::Cache=${TERMUX_PREFIX}/var/cache/apt \
+			-o Dir::Cache::Archives=${TERMUX_PREFIX}/var/cache/apt/archives \
 			-o Dir::Log=${TERMUX_PREFIX}/var/log/apt \
 			-o Dpkg::ConfigurePending=false \
 			-o Dpkg::Options::=--force-not-root \

@@ -410,7 +410,6 @@ termux_step_start_build() {
 			-o APT::Immediate-Configure=false \
 			-o APT::Get::Assume-Yes=true \
 			-o APT::Get::Fix-Missing=true \
-			-o APT::Get::ReInstall=true \
 			-o APT::Get::Download=true \
 			-o APT::Architecture=${TERMUX_ARCH} \
 			-o Dir::Etc=${TERMUX_PREFIX}/etc/apt/ \

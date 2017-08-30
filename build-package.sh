@@ -412,7 +412,6 @@ termux_step_start_build() {
 			-o APT::Get::Fix-Missing=true \
 			-o APT::Get::ReInstall=true \
 			-o APT::Get::Download=true \
-			-o APT::Cache::Installed=true \
 			-o APT::Architecture=${TERMUX_ARCH} \
 			-o Dir::Etc=${TERMUX_PREFIX}/etc/apt/ \
 			-o Dir::Etc::Sourcelist=${TERMUX_PREFIX}/etc/apt/sources.list \
@@ -426,10 +425,6 @@ termux_step_start_build() {
 			-o Dpkg::Options::=--force-not-root \
 			-o Dpkg::Options::=--force-architecture \
 			-o Dpkg::Options::=--admindir=${TERMUX_PREFIX}/var/lib/dpkg \
-			-o Debug::pkgInitialize=true \
-			-o Debug::pkgDPkgPM=true \
-			-o Debug::pkgCacheGen=true \
-			-o Debug::pkgAcquire=true \
 			-o pkgCacheGen::Essential=all"
 		export DEBCONF_FRONTEND=noninteractive
 		apt-get $TERMUX_APT clean && apt-get $TERMUX_APT update && apt-get $TERMUX_APT upgrade

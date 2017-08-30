@@ -411,6 +411,7 @@ termux_step_start_build() {
 			-o APT::Get::Assume-Yes=true \
 			-o APT::Get::Fix-Missing=true \
 			-o APT::Get::Download=true \
+			-o APT::Get::ReInstall=true \
 			-o APT::Architecture=${TERMUX_ARCH} \
 			-o Dir::Etc=${TERMUX_PREFIX}/etc/apt/ \
 			-o Dir::Etc::Sourcelist=${TERMUX_PREFIX}/etc/apt/sources.list \
@@ -428,11 +429,13 @@ termux_step_start_build() {
 		export DEBCONF_FRONTEND=noninteractive
 		apt-get $TERMUX_APT clean && apt-get $TERMUX_APT update && apt-get $TERMUX_APT upgrade
 		sudo chown -R builder:builder /data
+		ls -lahR ${TERMUX_PREFIX}/var/cache/apt
 		array=( TERMUX_PKG_DEPENDS TERMUX_PKG_BUILD_DEPENDS )
 		for i in "${array[@]}"; do
 			while IFS=',' read -ra PKG; do
 				for p in "${PKG[@]}"; do
 					p="$(echo -e "${p}" | tr -d '[:space:]')"
+					ls -lahR ${TERMUX_PREFIX}/var/cache/apt
 					apt-get $TERMUX_APT install "^${p}(-dev)?$":any
 					sudo chown -R builder:builder /data
 				done

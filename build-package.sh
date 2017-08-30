@@ -449,6 +449,8 @@ termux_step_start_build() {
 			fi
 		done
 	fi
+	
+	tree ${TERMUX_PREFIX}
 
 	TERMUX_PKG_FULLVERSION=$TERMUX_PKG_VERSION
 	if [ "$TERMUX_PKG_REVISION" != "0" ] || [ "$TERMUX_PKG_FULLVERSION" != "${TERMUX_PKG_FULLVERSION/-/}" ]; then

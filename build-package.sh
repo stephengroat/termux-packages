@@ -410,6 +410,7 @@ termux_step_start_build() {
 			-o APT::Immediate-Configure=false \
 			-o APT::Get::Assume-Yes=true \
 			-o APT::Get::Fix-Missing=true \
+			-o APT::Get::ReInstall=true \
 			-o APT::Cache::Installed=true \
 			-o APT::Architecture=${TERMUX_ARCH} \
 			-o Dir::Etc=${TERMUX_PREFIX}/etc/apt/ \
@@ -425,14 +426,14 @@ termux_step_start_build() {
 			-o Dpkg::Options::=--force-architecture \
 			-o Dpkg::Options::=--admindir=${TERMUX_PREFIX}/var/lib/dpkg"
 		export DEBCONF_FRONTEND=noninteractive
-		apt-get $TERMUX_APT update && apt-get $TERMUX_APT upgrade
+		apt-get $TERMUX_APT clean && apt-get $TERMUX_APT update && apt-get $TERMUX_APT upgrade
 		sudo chown -R builder:builder /data
 		array=( TERMUX_PKG_DEPENDS TERMUX_PKG_BUILD_DEPENDS )
 		for i in "${array[@]}"; do
 			while IFS=',' read -ra PKG; do
 				for p in "${PKG[@]}"; do
 					p="$(echo -e "${p}" | tr -d '[:space:]')"
-					apt-get --reinstall $TERMUX_APT install "^${p}(-dev)?$":any
+					apt-get $TERMUX_APT install "^${p}(-dev)?$":any
 					sudo chown -R builder:builder /data
 				done
 			done <<< "${!i}"

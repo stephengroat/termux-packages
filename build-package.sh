@@ -418,13 +418,14 @@ termux_step_start_build() {
 			-o Dir::State=${TERMUX_PREFIX}/var/lib/apt \
 			-o Dir::State::Lists=${TERMUX_PREFIX}/var/lib/apt/lists \
 			-o Dir::State::status=${TERMUX_PREFIX}/var/lib/dpkg/status \
-			-o Dir::Cache=${TERMUX_PREFIX}/var/cache/apt \
-			-o Dir::Cache::Archives=${TERMUX_PREFIX}/var/cache/apt/archives \
+			-o Dir::Cache= \
+			-o Dir::Cache::Archives= \
 			-o Dir::Log=${TERMUX_PREFIX}/var/log/apt \
 			-o Dpkg::ConfigurePending=false \
 			-o Dpkg::Options::=--force-not-root \
 			-o Dpkg::Options::=--force-architecture \
-			-o Dpkg::Options::=--admindir=${TERMUX_PREFIX}/var/lib/dpkg"
+			-o Dpkg::Options::=--admindir=${TERMUX_PREFIX}/var/lib/dpkg \
+			-o pkgCacheGen::Essential=all"
 		export DEBCONF_FRONTEND=noninteractive
 		apt-get $TERMUX_APT clean && apt-get $TERMUX_APT update && apt-get $TERMUX_APT upgrade
 		sudo chown -R builder:builder /data

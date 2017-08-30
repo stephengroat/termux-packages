@@ -410,6 +410,7 @@ termux_step_start_build() {
 			-o APT::Immediate-Configure=false \
 			-o APT::Get::Assume-Yes=true \
 			-o APT::Get::ReInstall=true \
+			-o APT::Get::Fix-Missing=true \
 			-o APT::Cache::Installed=true \
 			-o APT::Architecture=${TERMUX_ARCH} \
 			-o PackageManager::Configure=false \

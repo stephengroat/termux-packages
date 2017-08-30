@@ -427,20 +427,16 @@ termux_step_start_build() {
 		export DEBCONF_FRONTEND=noninteractive
 		apt-get $TERMUX_APT update && apt-get $TERMUX_APT upgrade
 		sudo chown -R builder:builder /data
-		while IFS=',' read -ra PKG; do
-			for p in "${PKG[@]}"; do
-				p="$(echo -e "${p}" | tr -d '[:space:]')"
-				apt-get $TERMUX_APT install "^${p}(-dev)?$":any
-				sudo chown -R builder:builder /data
-			done
-		done <<< "$TERMUX_PKG_DEPENDS"
-		while IFS=',' read -ra PKG; do
-			for p in "${PKG[@]}"; do
-				p="$(echo -e "${p}" | tr -d '[:space:]')"
-				apt-get $TERMUX_APT install "^${p}(-dev)?$":any
-				sudo chown -R builder:builder /data
-			done
-		done <<< "$TERMUX_PKG_BUILD_DEPENDS"
+		array=( TERMUX_PKG_DEPENDS TERMUX_PKG_BUILD_DEPENDS )
+		for i in "${array[@]}"; do
+			while IFS=',' read -ra PKG; do
+				for p in "${PKG[@]}"; do
+					p="$(echo -e "${p}" | tr -d '[:space:]')"
+					apt-get $TERMUX_APT install "^${p}(-dev)?$":any
+					sudo chown -R builder:builder /data
+				done
+			done <<< "${!i}"
+		done
 		tree /data/data/com.termux/files/usr
 	fi
 

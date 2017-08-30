@@ -405,7 +405,6 @@ termux_step_start_build() {
 		cat /data/data/com.termux/files/usr/SYMLINKS.txt
 		cat /etc/apt/apt.conf.d/*
 		TERMUX_APT=" \
-			--reinstall \
 			-o APT::Default-Release=stable \
 			-o APT::Clean-Installed=false \
 			-o APT::Immediate-Configure=false \
@@ -433,7 +432,7 @@ termux_step_start_build() {
 			while IFS=',' read -ra PKG; do
 				for p in "${PKG[@]}"; do
 					p="$(echo -e "${p}" | tr -d '[:space:]')"
-					apt-get $TERMUX_APT install "^${p}(-dev)?$":any
+					apt-get --reinstall $TERMUX_APT install "^${p}(-dev)?$":any
 					sudo chown -R builder:builder /data
 				done
 			done <<< "${!i}"

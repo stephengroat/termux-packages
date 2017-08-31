@@ -409,6 +409,7 @@ termux_step_start_build() {
 			-o APT::Clean-Installed=false \
 			-o APT::Immediate-Configure=false \
 			-o APT::Get::Assume-Yes=true \
+			-o APT::Get::Force-Yes=true \
 			-o APT::Get::Fix-Missing=true \
 			-o APT::Get::Download=true \
 			-o APT::Get::ReInstall=true \

@@ -405,16 +405,13 @@ termux_step_start_build() {
 		cat /etc/apt/apt.conf.d/*
 		TERMUX_APT=" \
 			-o APT::Default-Release=stable \
-			-o APT::Clean-Installed=false \
 			-o APT::Immediate-Configure=false \
 			-o APT::Get::Assume-Yes=true \
-			-o APT::Get::Force-Yes=true \
 			-o APT::Get::Fix-Missing=true \
 			-o APT::Get::Download=true \
 			-o APT::Get::ReInstall=true \
 			-o APT::Architecture=${TERMUX_ARCH} \
 			-o Dir::Etc=${TERMUX_PREFIX}/etc/apt/ \
-			-o Dir::Etc::Sourcelist=${TERMUX_PREFIX}/etc/apt/sources.list \
 			-o Dir::State=${TERMUX_PREFIX}/var/lib/apt \
 			-o Dir::State::status=${TERMUX_PREFIX}/var/lib/dpkg/status \
 			-o Dir::Cache=${TERMUX_PREFIX}/var/cache/apt \

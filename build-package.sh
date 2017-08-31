@@ -428,7 +428,7 @@ termux_step_start_build() {
 			-o Dpkg::Options::=--admindir=${TERMUX_PREFIX}/var/lib/dpkg \
 			-o pkgCacheGen::Essential=all"
 		export DEBCONF_FRONTEND=noninteractive
-		apt-get $TERMUX_APT clean && apt-get $TERMUX_APT update && apt-get $TERMUX_APT upgrade
+		apt-get $TERMUX_APT clean && apt-get $TERMUX_APT update # && apt-get $TERMUX_APT upgrade
 		sudo chown -R builder:builder /data
 		ls -lahR ${TERMUX_PREFIX}/var/cache/apt
 		array=( TERMUX_PKG_DEPENDS TERMUX_PKG_BUILD_DEPENDS )

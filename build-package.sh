@@ -390,8 +390,7 @@ termux_step_start_build() {
 		unzip ${TERMUX_COMMON_CACHEDIR}/bootstrap-${TERMUX_ARCH}.zip -d $TERMUX_PREFIX
 
 		# TODO move this install to Dockerfile
-		# Install add-apt-repository (software-properties-common)
-		sudo apt-get update && sudo apt-get -y dist-upgrade && sudo apt-get install -y software-properties-common libcap2-bin tree strace
+		sudo apt-get update && sudo apt-get -y dist-upgrade && sudo apt-get install -y libcap2-bin tree strace
 		# set capabilities on dpkg
 		# Some packages built by uid 1001 (builder is 1000)
 		# Need capabilities for dpkg to set non-builder uid

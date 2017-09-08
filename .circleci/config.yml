@@ -1,6 +1,9 @@
 version: 2
 jobs:
   build:
+    machine:
+      services:
+        - docker
     steps:
       - bundle install
       - bundle exec rake
